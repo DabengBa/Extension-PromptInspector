@@ -1,21 +1,39 @@
-# Prompt Inspector
+# 提示词检查器
 
-Adds an option to inspect and edit output prompts before sending them to the server.
+在将输出提示发送到服务器之前，添加一个检查和编辑选项。
 
-## Usage
+## Fork 来源
 
-1. Make sure you're using SillyTavern 1.12.1 or later. The latest `staging` branch is recommended.
-2. Install via the built-in extension manager using the URL: `https://github.com/SillyTavern/Extension-PromptInspector`
-3. Find a new option in the wand menu to toggle the prompt inspector.
-4. Send any chat prompt to get a popup with the prompt data.
+本项目 fork 自 [SillyTavern/Extension-PromptInspector](https://github.com/SillyTavern/Extension-PromptInspector)。
 
-## Remarks
+## 与原项目的区别
 
-1. Chat Completion prompts should be a valid JSON-serialized array of objects. It represents the completion BEFORE applying backend-specific post-processing, i.e. any number of system messages, assistant message first, non-alternating roles, etc. are ALLOWED.
-2. Text Completion prompts can be any string that doesn't overflow the prompt length limit in tokens. Go wild!
-3. Pressing "Cancel" discards any changes, but doesn't cancel the request.
-4. Pressing "OK" sends the modified prompt to the server. Modified prompts are ephemeral and not saved.
+*   **更易读的提示格式**: 原项目使用JSON格式,本项目现在以人类可读的格式（例如，“角色：内容”）显示，简化了复杂提示的编辑。
+*   **简体中文界面**: 整个扩展的用户界面和文档都已本地化为简体中文。
 
-## License
+## 使用方法
+
+1. 请确保您使用的是 SillyTavern 1.12.1 或更高版本。建议使用最新的 `staging` 分支。
+
+2. 通过内置的扩展管理器使用以下 URL 安装：`https://github.com/DabengBa/Extension-PromptInspector`
+
+   ![image-20250715103136461](assets/image-20250715103136461.png)![image-20250715103216544](assets/image-20250715103216544.png)
+
+3. 刷新页面. 在魔棒菜单中找到一个新选项来切换提示检查器。
+
+   ![image-20250715103313979](assets/image-20250715103313979.png)![image-20250715103356944](assets/image-20250715103356944.png)
+
+4. 发送任何聊天提示以获取带有提示数据的弹出窗口。
+
+![image-20250715103445378](assets/image-20250715103445378.png)
+
+## 备注
+
+1.  聊天补全提示现在以人类可读的格式显示（例如，“角色：内容”）。您可以在此格式下编辑它们，它们将被自动转换回所需的 JSON 结构。这简化了复杂提示的编辑。
+2.  文本补全提示可以是任何不超过提示长度限制（以 token 计）的字符串。尽情发挥吧！
+3.  按“Discard”会放弃所有更改，然后发送到API。
+4.  按“Save Changes”会将修改后的提示发送到服务器。修改后的提示是临时的，不会被保存。
+
+## 许可证
 
 AGPL-3.0
