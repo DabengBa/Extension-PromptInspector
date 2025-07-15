@@ -179,7 +179,7 @@ async function showPromptInspector(input) {
     prompt.val(input);
     /** @type {import('../../../popup').CustomPopupButton} */
     const customButton = {
-        text: 'Cancel generation',
+        text: '取消发送',
         result: POPUP_RESULT.CANCELLED,
         appendAtEnd: true,
         action: async () => {
@@ -187,7 +187,7 @@ async function showPromptInspector(input) {
             await popup.complete(POPUP_RESULT.CANCELLED);
         },
     };
-    const popup = new Popup(template, POPUP_TYPE.CONFIRM, '', { wide: true, large: true, okButton: 'Save changes', cancelButton: 'Discard changes', customButtons: [customButton] });
+    const popup = new Popup(template, POPUP_TYPE.CONFIRM, '', { wide: true, large: true, okButton: '保存发送', cancelButton: '放弃更改并发送', customButtons: [customButton] });
     const result = await popup.show();
 
     // If the user cancels, return the original input
