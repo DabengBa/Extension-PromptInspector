@@ -74,16 +74,18 @@ eventSource.on(event_types.CHAT_COMPLETION_PROMPT_READY, async (data) => {
         return;
     }
 
-    const promptJson = JSON.stringify(data.chat, null, 4);
-    const result = await showPromptInspector(promptJson);
+    // 第1步：转换为可读格式
+    const readablePrompt = toReadableFormat(data.chat);
+    const result = await showPromptInspector(readablePrompt);
 
-    if (result === promptJson) {
+    if (result === readablePrompt) { // 检查可读格式是否有变化
         console.debug('Prompt Inspector: No changes');
         return;
     }
 
     try {
-        const chat = JSON.parse(result);
+        // 第2步：从可读格式转换回JSON数组对象
+        const chat = fromReadableFormat(result);
 
         // Chat is passed by reference, so we can modify it directly
         if (Array.isArray(chat) && Array.isArray(data.chat)) {
@@ -92,8 +94,8 @@ eventSource.on(event_types.CHAT_COMPLETION_PROMPT_READY, async (data) => {
 
         console.debug('Prompt Inspector: Prompt updated');
     } catch (e) {
-        console.error('Prompt Inspector: Invalid JSON');
-        toastr.error('Invalid JSON');
+        console.error('Prompt Inspector: Invalid JSON or readable format', e);
+        toastr.error('Invalid readable format: ' + e.message);
     }
 });
 
@@ -122,6 +124,49 @@ eventSource.on(event_types.GENERATE_AFTER_COMBINE_PROMPTS, async (data) => {
     data.prompt = result;
     console.debug('Prompt Inspector: Prompt updated');
 });
+
+/**
+ * 将聊天JSON数组转换为可读的字符串格式
+ * @param {Array<Object>} chatArray - The chat completion array
+ * @returns {string} A human-readable string representation
+ */
+function toReadableFormat(chatArray) {
+    if (!Array.isArray(chatArray)) return JSON.stringify(chatArray, null, 4); // 如果不是预期的格式,则返回原始JSON
+
+    return chatArray.map(item => {
+        // 每个消息块由 角色行、内容、分隔符 组成
+        return `${item.role}:\n${item.content}\n--------------------`;
+    }).join('\n');
+}
+
+/**
+ * 将可读的字符串格式转换回聊天JSON数组
+ * @param {string} readableString - The human-readable string
+ * @returns {Array<Object>} The chat completion array
+ */
+function fromReadableFormat(readableString) {
+    const chatArray = [];
+    // 使用分隔符来切分每个消息块
+    const blocks = readableString.trim().split(/^-{5,}\s*$/m);
+
+    for (const block of blocks) {
+        if (block.trim() === '') continue;
+
+        // 匹配第一行的 "role:"
+        const match = block.trim().match(/^(\w+):\s*\n/);
+        if (match && match[1]) {
+            const role = match[1];
+            // role之后的所有内容都算作content
+            const content = block.trim().substring(match[0].length).trim();
+            chatArray.push({ role, content });
+        } else {
+            // 如果格式不匹配, 抛出错误, 防止发送错误的数据
+            throw new Error('Invalid format in prompt. Each block must start with "role:".');
+        }
+    }
+
+    return chatArray;
+}
 
 /**
  * Shows a prompt inspector popup.
